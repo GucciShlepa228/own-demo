@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWN — Твой личный банк</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --accent-glow: rgba(108,92,231,0.3);
+    --text: #f0f0f5;
+    --text2: #8888aa;
+    --text3: #44445a;
+    --green: #00d084;
+    --red: #ff4757;
+    --yellow: #ffd32a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent2); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text2); text-decoration: none; font-size: 14px; transition: color .2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 10px 22px; border-radius: 10px; font-size: 14px;
+    font-weight: 500; cursor: pointer; transition: all .2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .nav-btn:hover { background: #7d6ff0; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 120px 40px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -55%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(108,92,231,0.1); border: 1px solid rgba(108,92,231,0.3);
+    padding: 6px 16px; border-radius: 100px; font-size: 12px;
+    color: var(--accent2); margin-bottom: 28px; font-weight: 500;
+  }
+  .hero-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 700; text-align: center; line-height: 1.1;
+    letter-spacing: -2px; max-width: 800px; margin-bottom: 24px;
+  }
+  h1 em { color: var(--accent2); font-style: normal; }
+  .hero-sub {
+    font-size: 18px; color: var(--text2); text-align: center;
+    max-width: 520px; margin-bottom: 48px; line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: var(--accent); color: #fff; border: none;
+    padding: 16px 32px; border-radius: 12px; font-size: 16px;
+    font-weight: 600; cursor: pointer; transition: all .25s;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 0 40px var(--accent-glow);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px var(--accent-glow); }
+  .btn-ghost {
+    background: transparent; color: var(--text); 
+    border: 1px solid var(--border);
+    padding: 16px 32px; border-radius: 12px; font-size: 16px;
+    font-weight: 500; cursor: pointer; transition: all .25s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 0;
+    margin-top: 72px; flex-wrap: wrap;
+    border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; max-width: 700px; width: 100%;
+  }
+  .stat {
+    flex: 1; min-width: 150px; padding: 24px 28px;
+    border-right: 1px solid var(--border); text-align: center;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px; font-weight: 700; color: var(--accent2);
+  }
+  .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  /* ── SECTION ── */
+  section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent2); margin-bottom: 16px;
+  }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 4vw, 44px); font-weight: 700;
+    letter-spacing: -1px; margin-bottom: 16px;
+  }
+  .section-sub { font-size: 17px; color: var(--text2); max-width: 480px; line-height: 1.7; }
+
+  /* ── WALLET DEMO ── */
+  #app { background: var(--bg); }
+  .wallet-demo-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 56px;
+    align-items: start;
+  }
+  .phone-frame {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 28px; padding: 28px; position: relative;
+    box-shadow: 0 0 80px rgba(108,92,231,0.1);
+  }
+  .phone-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .wallet-address {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text3);
+    background: var(--surface2); padding: 6px 12px; border-radius: 8px;
+  }
+  .network-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--green); font-weight: 500;
+  }
+  .network-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .balance-card {
+    background: linear-gradient(135deg, #1a1535 0%, #0d1a2e 100%);
+    border: 1px solid rgba(108,92,231,0.2);
+    border-radius: 20px; padding: 28px; margin-bottom: 20px;
+  }
+  .balance-label { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+  .balance-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 36px; font-weight: 700; color: var(--text);
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .balance-currency { font-size: 16px; color: var(--text2); }
+  .balance-change {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; color: var(--green); margin-top: 8px;
+  }
+  .wallet-actions {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px;
+  }
+  .wallet-action-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 8px; cursor: pointer;
+    transition: all .2s; font-size: 11px; color: var(--text2);
+    font-family: 'Inter', sans-serif;
+  }
+  .wallet-action-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(108,92,231,0.08); }
+  .wallet-action-btn .icon { font-size: 20px; }
+  .pockets-label { font-size: 12px; color: var(--text3); margin-bottom: 12px; font-weight: 500; }
+  .pocket {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+    cursor: pointer; transition: all .2s;
+  }
+  .pocket:hover { border-color: rgba(108,92,231,0.3); }
+  .pocket-left { display: flex; align-items: center; gap: 12px; }
+  .pocket-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .pocket-name { font-size: 14px; font-weight: 500; }
+  .pocket-rule { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .pocket-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 600;
+  }
+
+  /* ── DEMO CONTROLS ── */
+  .demo-controls {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .demo-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+  }
+  .demo-card h4 {
+    font-size: 14px; font-weight: 600; margin-bottom: 4px;
+    color: var(--text);
+  }
+  .demo-card p { font-size: 12px; color: var(--text2); margin-bottom: 14px; }
+  .demo-btn {
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all .2s; font-family: 'Inter', sans-serif;
+    margin-bottom: 8px;
+  }
+  .demo-btn:last-child { margin-bottom: 0; }
+  .demo-btn:hover { border-color: var(--accent); background: rgba(108,92,231,0.08); }
+  .demo-btn.danger:hover { border-color: var(--red); background: rgba(255,71,87,0.08); color: var(--red); }
+  .tx-feed {
+    max-height: 180px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .tx-feed::-webkit-scrollbar { width: 3px; }
+  .tx-feed::-webkit-scrollbar-track { background: transparent; }
+  .tx-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  .tx-item {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; padding: 8px 10px;
+    background: var(--surface2); border-radius: 8px;
+    animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .tx-desc { color: var(--text2); }
+  .tx-amount { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+  .tx-amount.out { color: var(--red); }
+  .tx-amount.in { color: var(--green); }
+
+  /* ── FEATURES GRID ── */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px;
+  }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; transition: all .3s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at top left, var(--accent-glow), transparent 60%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-card:hover { border-color: rgba(108,92,231,0.3); transform: translateY(-2px); }
+  .feature-icon {
+    font-size: 28px; margin-bottom: 16px; display: block;
+  }
+  .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+  .feature-card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  /* ── CODE BLOCK ── */
+  .code-section { background: var(--bg); }
+  .code-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 56px; align-items: start;
+  }
+  .code-tabs { display: flex; gap: 4px; margin-bottom: 0; }
+  .code-tab {
+    padding: 8px 16px; border-radius: 8px 8px 0 0;
+    font-size: 12px; color: var(--text3); cursor: pointer; transition: all .2s;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid transparent; border-bottom: none;
+  }
+  .code-tab.active { color: var(--accent2); background: var(--surface2); border-color: var(--border); }
+  pre {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 0 12px 12px 12px; padding: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.7; overflow-x: auto;
+    color: #cdd6f4;
+  }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .num { color: #fab387; }
+  .cm { color: #585b70; }
+  .code-explain { display: flex; flex-direction: column; gap: 16px; }
+  .explain-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px;
+  }
+  .explain-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .explain-item p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .explain-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;
+    background: rgba(108,92,231,0.15); color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 56px;
+  }
+  .step {
+    position: relative; padding: 24px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px;
+  }
+  .step-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 48px; font-weight: 700; color: var(--border);
+    line-height: 1; margin-bottom: 12px;
+  }
+  .step h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .step p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .step-connector {
+    position: absolute; right: -20px; top: 50%;
+    transform: translateY(-50%); color: var(--text3); font-size: 20px; z-index: 1;
+    display: none;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center; padding: 100px 40px;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: ''; position: absolute;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(108,92,231,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+  .cta-section h2 { font-size: clamp(28px, 4vw, 48px); margin-bottom: 20px; }
+  .cta-section p { font-size: 17px; color: var(--text2); margin-bottom: 40px; }
+  .waitlist-form {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .waitlist-input {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; font-size: 15px;
+    color: var(--text); font-family: 'Inter', sans-serif;
+    width: 300px; outline: none; transition: border-color .2s;
+  }
+  .waitlist-input:focus { border-color: var(--accent); }
+  .waitlist-input::placeholder { color: var(--text3); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px; text-align: center;
+    color: var(--text3); font-size: 13px;
+  }
+  footer span { color: var(--accent2); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px); z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 36px; max-width: 420px; width: 90%;
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+  .modal-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; font-size: 15px;
+    color: var(--text); font-family: 'Inter', sans-serif;
+    outline: none; margin-bottom: 12px; transition: border-color .2s;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+  .modal-cancel {
+    flex: 1; padding: 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text2); font-size: 14px; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all .2s;
+  }
+  .modal-cancel:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .modal-confirm {
+    flex: 2; padding: 14px; border-radius: 10px;
+    border: none; background: var(--accent);
+    color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all .2s;
+  }
+  .modal-confirm:hover { background: #7d6ff0; }
+
+  /* ── TOAST ── */
+  .toast-container {
+    position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .toast {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 20px;
+    font-size: 13px; min-width: 240px;
+    animation: slideLeft .3s ease;
+    display: flex; align-items: center; gap: 10px;
+  }
+  @keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+  .toast.success { border-color: rgba(0,208,132,0.3); }
+  .toast.error { border-color: rgba(255,71,87,0.3); }
+
+  /* ── SEND MODAL ── */
+  #sendModal .amount-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 40px; font-weight: 700; text-align: center;
+    padding: 20px 0; color: var(--text);
+  }
+  #sendModal .amount-display span { font-size: 18px; color: var(--text2); }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 20px; }
+    .wallet-demo-wrap, .code-wrap { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    h1 { letter-spacing: -1px; }
+    .stats-bar { margin-top: 48px; }
+    .cta-section { padding: 60px 20px; }
+  }
+  @media (max-width: 480px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .wallet-actions { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">OWN<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#app">Демо</a></li>
+    <li><a href="#features">Возможности</a></li>
+    <li><a href="#code">SDK</a></li>
+    <li><a href="#how">Как это работает</a></li>
+  </ul>
+  <button class="nav-btn" onclick="scrollToApp()">Открыть кошелёк</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">Бета · Работает на TON блокчейне</div>
+  <h1>Твои деньги.<br><em>Только твои.</em></h1>
+  <p class="hero-sub">Первый некастодиальный кошелёк с программируемыми правилами. Ни банк, ни биржа, ни мы — никто не может заморозить твой счёт.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="scrollToApp()">Попробовать демо</button>
+    <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Как это работает</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num" id="counter1">0</div>
+      <div class="stat-label">Активных кошельков</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="counter2">$0</div>
+      <div class="stat-label">Под управлением</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="counter3">0%</div>
+      <div class="stat-label">Комиссия сети</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Контроля банков</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP DEMO -->
+<section id="app">
+  <div class="section-label">Интерактивное демо</div>
+  <h2>Твой личный банк</h2>
+  <p class="section-sub">Нажимай на кнопки — это живая симуляция работы кошелька.</p>
+
+  <div class="wallet-demo-wrap">
+    <!-- Phone -->
+    <div class="phone-frame">
+      <div class="phone-header">
+        <div class="wallet-address" id="walletAddr">0:3f9a...b4e2</div>
+        <div class="network-badge">TON Mainnet</div>
+      </div>
+
+      <div class="balance-card">
+        <div class="balance-label">Общий баланс</div>
+        <div class="balance-amount">
+          <span id="mainBalance">4 820</span>
+          <span class="balance-currency">USDT</span>
+        </div>
+        <div class="balance-change">▲ +2.4% за сегодня</div>
+      </div>
+
+      <div class="wallet-actions">
+        <button class="wallet-action-btn" onclick="openSend()">
+          <span class="icon">↗</span> Отправить
+        </button>
+        <button class="wallet-action-btn" onclick="openReceive()">
+          <span class="icon">↙</span> Получить
+        </button>
+        <button class="wallet-action-btn" onclick="openSwap()">
+          <span class="icon">⇄</span> Обмен
+        </button>
+        <button class="wallet-action-btn" onclick="showToast('Раздел в разработке', 'success')">
+          <span class="icon">⚙</span> Правила
+        </button>
+      </div>
+
+      <div class="pockets-label">Карманы (Vaults)</div>
+      <div class="pocket" onclick="pocketClick('savings')">
+        <div class="pocket-left">
+          <div class="pocket-icon" style="background:rgba(0,208,132,0.1)">💰</div>
+          <div>
+            <div class="pocket-name">Накопления</div>
+            <div class="pocket-rule">Авто 30% от поступлений</div>
+          </div>
+        </div>
+        <div class="pocket-amount" id="savingsAmt" style="color:var(--green)">1 446</div>
+      </div>
+      <div class="pocket" onclick="pocketClick('tax')">
+        <div class="pocket-left">
+          <div class="pocket-icon" style="background:rgba(255,211,42,0.1)">🧾</div>
+          <div>
+            <div class="pocket-name">Налоговый резерв</div>
+            <div class="pocket-rule">Авто 20% от поступлений</div>
+          </div>
+        </div>
+        <div class="pocket-amount" id="taxAmt" style="color:var(--yellow)">964</div>
+      </div>
+      <div class="pocket" onclick="pocketClick('sub')">
+        <div class="pocket-left">
+          <div class="pocket-icon" style="background:rgba(108,92,231,0.1)">📱</div>
+          <div>
+            <div class="pocket-name">Подписки</div>
+            <div class="pocket-rule">Авто-списание 15-го числа</div>
+          </div>
+        </div>
+        <div class="pocket-amount" id="subAmt">240</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="demo-controls">
+      <div class="demo-card">
+        <h4>💸 Симуляция транзакций</h4>
+        <p>Попробуй как работает автоматическое распределение денег по карманам</p>
+        <button class="demo-btn" onclick="simulateIncome()">Получить 1 000 USDT (доход)</button>
+        <button class="demo-btn" onclick="simulateSub()">Сработала подписка Netflix (-15 USDT)</button>
+        <button class="demo-btn" onclick="simulateFreeze()">🏦 Попытка банка заморозить счёт</button>
+      </div>
+
+      <div class="demo-card">
+        <h4>🔒 Безопасность</h4>
+        <p>Действия, которые невозможны без твоего ключа</p>
+        <button class="demo-btn danger" onclick="simulateHack()">Попытка взлома</button>
+        <button class="demo-btn danger" onclick="simulateGovt()">Запрос от регулятора</button>
+      </div>
+
+      <div class="demo-card">
+        <h4>📋 История транзакций</h4>
+        <div class="tx-feed" id="txFeed">
+          <div class="tx-item">
+            <span class="tx-desc">Получено от Антона</span>
+            <span class="tx-amount in">+500 USDT</span>
+          </div>
+          <div class="tx-item">
+            <span class="tx-desc">→ Накопления (30%)</span>
+            <span class="tx-amount out">-150 USDT</span>
+          </div>
+          <div class="tx-item">
+            <span class="tx-desc">Netflix • автосписание</span>
+            <span class="tx-amount out">-15 USDT</span>
+          </div>
+          <div class="tx-item">
+            <span class="tx-desc">Доход от стейкинга</span>
+            <span class="tx-amount in">+12.4 USDT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Возможности</div>
+  <h2>Всё, что должен уметь<br>твой банк</h2>
+  <p class="section-sub">Контроль, которого раньше не существовало.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">🔑</span>
+      <h3>Только твой ключ</h3>
+      <p>Приватный ключ хранится только на твоём устройстве. Ни мы, ни хакеры не могут получить доступ без него.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <h3>Программируемые правила</h3>
+      <p>Напиши JavaScript-правила для своего кошелька: автосписания, распределение дохода, условные переводы.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🏦</span>
+      <h3>Карманы (Vaults)</h3>
+      <p>Создавай неограниченное количество изолированных карманов с индивидуальными правилами для каждого.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <h3>Доля от комиссий сети</h3>
+      <p>Чем активнее ты пользуешься OWN — тем большую долю комиссий всей сети получаешь каждую неделю.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🛡️</span>
+      <h3>Нельзя заморозить</h3>
+      <p>Смарт-контракт исполняет только твои инструкции. Суд, банк, регулятор — никто не может изменить это.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🌍</span>
+      <h3>Без границ</html3>
+      <p>Отправляй деньги в любую точку мира за секунды. Без SWIFT, без банка-посредника, без комиссий 5%.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CODE -->
+<section id="code" class="code-section">
+  <div class="section-label">SDK для разработчиков</div>
+  <h2>Запрограммируй<br>свой кошелёк</h2>
+  <p class="section-sub">Знаешь JavaScript? Ты можешь сделать со своим кошельком всё что захочешь.</p>
+
+  <div class="code-wrap">
+    <div>
+      <div class="code-tabs">
+        <div class="code-tab active" onclick="switchTab(this, 'tab1')">распределение.js</div>
+        <div class="code-tab" onclick="switchTab(this, 'tab2')">подписки.js</div>
+        <div class="code-tab" onclick="switchTab(this, 'tab3')">лимиты.js</div>
+      </div>
+      <div id="tab1">
+<pre><span class="cm">// 🎯 Автораспределение любого поступления</span>
+<span class="cm">// Срабатывает при каждом входящем переводе</span>
+
+vault.<span class="fn">onReceive</span>(<span class="kw">async</span> (tx) => {
+  <span class="kw">const</span> { amount, from } = tx;
+
+  <span class="cm">// Распределяем по карманам</span>
+  <span class="kw">await</span> vault.<span class="fn">send</span>({
+    to: <span class="str">'savings'</span>,
+    amount: amount * <span class="num">0.30</span>,
+    note: <span class="str">'Накопления 30%'</span>
+  });
+
+  <span class="kw">await</span> vault.<span class="fn">send</span>({
+    to: <span class="str">'tax_reserve'</span>,
+    amount: amount * <span class="num">0.20</span>,
+    note: <span class="str">'Налоговый резерв'</span>
+  });
+
+  <span class="cm">// Уведомление в Telegram</span>
+  <span class="kw">await</span> vault.<span class="fn">notify</span>({
+    message: <span class="str">`💰 Получено ${amount} USDT от ${from}`</span>
+  });
+});</pre>
+      </div>
+      <div id="tab2" style="display:none">
+<pre><span class="cm">// 📅 Автоматические подписки</span>
+<span class="cm">// Списывает деньги по расписанию</span>
+
+vault.<span class="fn">schedule</span>({
+  name: <span class="str">'Netflix'</span>,
+  cron: <span class="str">'0 9 15 * *'</span>, <span class="cm">// 15-го каждый месяц</span>
+  <span class="fn">action</span>: <span class="kw">async</span> () => {
+    <span class="cm">// Проверяем баланс перед списанием</span>
+    <span class="kw">if</span> (vault.balance < <span class="num">50</span>) {
+      <span class="kw">await</span> vault.<span class="fn">notify</span>({
+        message: <span class="str">'⚠️ Мало средств для Netflix'</span>
+      });
+      <span class="kw">return</span>;
+    }
+
+    <span class="kw">await</span> vault.<span class="fn">send</span>({
+      to: <span class="str">'UQC...netflix'</span>,
+      amount: <span class="num">15</span>,
+      currency: <span class="str">'USDT'</span>
+    });
+  }
+});</pre>
+      </div>
+      <div id="tab3" style="display:none">
+<pre><span class="cm">// 🚨 Лимиты и защита от трат</span>
+<span class="cm">// Блокирует крупные переводы</span>
+
+vault.<span class="fn">onTransfer</span>(<span class="kw">async</span> (tx, next) => {
+  <span class="kw">const</span> dailySpent = <span class="kw">await</span> vault.<span class="fn">getDailySpent</span>();
+
+  <span class="cm">// Дневной лимит 500 USDT</span>
+  <span class="kw">if</span> (dailySpent + tx.amount > <span class="num">500</span>) {
+    <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'Превышен дневной лимит'</span>);
+  }
+
+  <span class="cm">// Для сумм >1000 нужно 2 подтверждения</span>
+  <span class="kw">if</span> (tx.amount > <span class="num">1000</span>) {
+    <span class="kw">await</span> vault.<span class="fn">requireMultiSig</span>({
+      signers: [<span class="str">'trusted_contact_1'</span>],
+      threshold: <span class="num">1</span>
+    });
+  }
+
+  <span class="fn">next</span>(); <span class="cm">// Пропускаем транзакцию</span>
+});</pre>
+      </div>
+    </div>
+
+    <div class="code-explain">
+      <div class="explain-item">
+        <div class="explain-tag">onReceive</div>
+        <h4>Хук на получение денег</h4>
+        <p>Срабатывает автоматически при каждом входящем переводе. Можно распределять деньги, отправлять уведомления, логировать.</p>
+      </div>
+      <div class="explain-item">
+        <div class="explain-tag">schedule</div>
+        <h4>Расписание платежей</h4>
+        <p>Cron-синтаксис для настройки любых повторяющихся платежей. Подписки, аренда, зарплаты — всё автоматически.</p>
+      </div>
+      <div class="explain-item">
+        <div class="explain-tag">onTransfer</div>
+        <h4>Фильтр исходящих</h4>
+        <p>Перехватывает каждый перевод перед отправкой. Можно добавить лимиты, мультиподпись, проверку адреса.</p>
+      </div>
+      <div class="explain-item">
+        <div class="explain-tag">Vault</div>
+        <h4>Изолированные карманы</h4>
+        <p>Каждый карман — отдельный смарт-контракт со своими правилами. Деньги физически разделены на блокчейне.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">Как это работает</div>
+  <h2>Четыре шага до<br>твоего банка</h2>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Создаёшь кошелёк</h3>
+      <p>Генерируется приватный ключ — он хранится только у тебя. Мы его никогда не видим.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Деплоишь контракт</h3>
+      <p>Твой личный смарт-контракт записывается в TON блокчейн. Теперь это математически твоё.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Настраиваешь правила</h3>
+      <p>Через UI или SDK пишешь правила: как распределять деньги, когда списывать, кому доверять.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Получаешь долю</h3>
+      <p>Каждую неделю получаешь часть комиссий всей сети пропорционально твоей активности.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="section-label" style="text-align:center">Ранний доступ</div>
+  <h2>Стань первым,<br>кто получит доступ</h2>
+  <p>Первые 1 000 пользователей получат повышенную долю комиссий навсегда.</p>
+  <div class="waitlist-form">
+    <input type="email" class="waitlist-input" id="emailInput" placeholder="твой@email.com">
+    <button class="btn-primary" onclick="joinWaitlist()">Попасть в список</button>
+  </div>
+  <div id="waitlistCount" style="margin-top:20px; font-size:13px; color:var(--text3)">
+    🔥 Уже 247 человек в списке ожидания
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; margin-bottom:8px;">OWN<span style="color:var(--accent2)">.</span></div>
+  Построено на <span>TON блокчейне</span> · Некастодиальный протокол · Ранняя бета
+  <br><br>
+  <span style="font-size:11px; color:var(--text3)">⚠️ Это демо-версия для презентации. Реальные транзакции не выполняются.</span>
+</footer>
+
+<!-- SEND MODAL -->
+<div class="modal-overlay" id="sendModal">
+  <div class="modal">
+    <h3>↗ Отправить</h3>
+    <p>Введи адрес и сумму перевода</p>
+    <input class="modal-input" id="sendTo" placeholder="TON адрес получателя">
+    <input class="modal-input" id="sendAmount" placeholder="Сумма в USDT" type="number">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('sendModal')">Отмена</button>
+      <button class="modal-confirm" onclick="confirmSend()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIVE MODAL -->
+<div class="modal-overlay" id="receiveModal">
+  <div class="modal">
+    <h3>↙ Получить</h3>
+    <p>Поделись адресом своего кошелька для получения платежей</p>
+    <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; margin-bottom:16px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent2); word-break:break-all;">
+        UQD3f9a4b2c1d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4b2e2
+      </div>
+    </div>
+    <div style="font-size:80px; text-align:center; margin-bottom:16px;">⬛</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('receiveModal')">Закрыть</button>
+      <button class="modal-confirm" onclick="copyAddr()">Скопировать адрес</button>
+    </div>
+  </div>
+</div>
+
+<!-- SWAP MODAL -->
+<div class="modal-overlay" id="swapModal">
+  <div class="modal">
+    <h3>⇄ Обмен валют</h3>
+    <p>Обмен между TON, USDT и другими токенами</p>
+    <input class="modal-input" placeholder="Из: 100 USDT" type="number">
+    <div style="text-align:center; color:var(--text3); font-size:20px; margin: 4px 0;">⇅</div>
+    <input class="modal-input" placeholder="В: 0.42 TON (≈ $100)" readonly style="color:var(--accent2)">
+    <div style="font-size:12px; color:var(--text3); margin-bottom:16px;">Курс: 1 TON = 237.5 USDT · Комиссия: 0.1%</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('swapModal')">Отмена</button>
+      <button class="modal-confirm" onclick="confirmSwap()">Обменять</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ── COUNTERS ──
+function animateCounter(el, target, prefix='', suffix='', duration=2000) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = prefix + Math.floor(start).toLocaleString('ru') + suffix;
+  }, 16);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    animateCounter(document.getElementById('counter1'), 2847, '', '');
+    animateCounter(document.getElementById('counter2'), 1420000, '$', '');
+    animateCounter(document.getElementById('counter3'), 0, '', '% → тебе');
+  }, 500);
+  // After counter3 animation
+  setTimeout(() => {
+    document.getElementById('counter3').textContent = '100% → тебе';
+  }, 2600);
+});
+
+// ── NAV ──
+function scrollToApp() {
+  document.getElementById('app').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── BALANCE STATE ──
+let balance = 4820;
+let savings = 1446;
+let tax = 964;
+let sub = 240;
+
+function updateUI() {
+  document.getElementById('mainBalance').textContent = balance.toLocaleString('ru');
+  document.getElementById('savingsAmt').textContent = savings.toLocaleString('ru');
+  document.getElementById('taxAmt').textContent = tax.toLocaleString('ru');
+  document.getElementById('subAmt').textContent = sub.toLocaleString('ru');
+}
+
+function addTx(desc, amount, type) {
+  const feed = document.getElementById('txFeed');
+  const item = document.createElement('div');
+  item.className = 'tx-item';
+  item.innerHTML = `<span class="tx-desc">${desc}</span><span class="tx-amount ${type}">${amount}</span>`;
+  feed.insertBefore(item, feed.firstChild);
+}
+
+// ── SIMULATIONS ──
+function simulateIncome() {
+  const income = 1000;
+  balance += income;
+  savings += income * 0.30;
+  tax += income * 0.20;
+
+  addTx('💸 Получен платёж', '+1 000 USDT', 'in');
+  setTimeout(() => addTx('→ Накопления (30%)', '-300 USDT', 'out'), 400);
+  setTimeout(() => addTx('→ Налоговый резерв (20%)', '-200 USDT', 'out'), 800);
+
+  updateUI();
+  showToast('✅ Правила выполнены автоматически: 300 USDT → накопления, 200 USDT → налоги', 'success');
+}
+
+function simulateSub() {
+  if (sub < 15) { showToast('⚠️ Недостаточно средств в кармане подписок', 'error'); return; }
+  balance -= 15; sub -= 15;
+  addTx('📱 Netflix • автосписание', '-15 USDT', 'out');
+  updateUI();
+  showToast('🤖 Правило сработало: Netflix списал 15 USDT по расписанию', 'success');
+}
+
+function simulateFreeze() {
+  setTimeout(() => {
+    showToast('🏦 Банк: "Запрос на заморозку счёта отправлен"', 'error');
+    setTimeout(() => {
+      showToast('🔒 Блокчейн: запрос отклонён — смарт-контракт не принимает внешние команды', 'success');
+      setTimeout(() => {
+        showToast('✅ Твой счёт в безопасности. Никто не может его заморозить.', 'success');
+      }, 1500);
+    }, 1500);
+  }, 300);
+}
+
+function simulateHack() {
+  showToast('💀 Хакер пытается получить доступ...', 'error');
+  setTimeout(() => showToast('🔐 Попытка отклонена: неверный приватный ключ', 'error'), 1200);
+  setTimeout(() => showToast('🛡️ Атака заблокирована. Кошелёк в безопасности.', 'success'), 2400);
+}
+
+function simulateGovt() {
+  showToast('📋 Регулятор запрашивает данные о транзакциях...', 'error');
+  setTimeout(() => showToast('⚖️ OWN: мы не хранили твои данные — нам нечего предоставить', 'success'), 1500);
+  setTimeout(() => showToast('✅ Некастодиальная архитектура защитила приватность', 'success'), 3000);
+}
+
+// ── POCKETS ──
+function pocketClick(type) {
+  const names = { savings: 'Накопления', tax: 'Налоговый резерв', sub: 'Подписки' };
+  const amounts = { savings, tax, sub };
+  showToast(`📂 ${names[type]}: ${amounts[type].toLocaleString('ru')} USDT`, 'success');
+}
+
+// ── MODALS ──
+function openSend() { document.getElementById('sendModal').classList.add('active'); }
+function openReceive() { document.getElementById('receiveModal').classList.add('active'); }
+function openSwap() { document.getElementById('swapModal').classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function confirmSend() {
+  const to = document.getElementById('sendTo').value;
+  const amount = parseFloat(document.getElementById('sendAmount').value);
+  if (!to || !amount) { showToast('Заполни все поля', 'error'); return; }
+  if (amount > balance) { showToast('Недостаточно средств', 'error'); return; }
+  balance -= amount;
+  updateUI();
+  addTx(`↗ Перевод на ${to.slice(0,8)}...`, `-${amount} USDT`, 'out');
+  closeModal('sendModal');
+  showToast(`✅ Отправлено ${amount} USDT`, 'success');
+  document.getElementById('sendTo').value = '';
+  document.getElementById('sendAmount').value = '';
+}
+
+function copyAddr() {
+  navigator.clipboard.writeText('UQD3f9a4b2c1d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4b2e2');
+  showToast('📋 Адрес скопирован', 'success');
+  closeModal('receiveModal');
+}
+
+function confirmSwap() {
+  balance += 0;
+  closeModal('swapModal');
+  showToast('✅ Обмен выполнен через DEX (симуляция)', 'success');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+
+// ── CODE TABS ──
+function switchTab(el, tabId) {
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['tab1','tab2','tab3'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById(tabId).style.display = 'block';
+}
+
+// ── WAITLIST ──
+let waitlistCount = 247;
+function joinWaitlist() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) { showToast('Введи корректный email', 'error'); return; }
+  waitlistCount++;
+  document.getElementById('waitlistCount').textContent = `🔥 Уже ${waitlistCount} человек в списке ожидания`;
+  document.getElementById('emailInput').value = '';
+  showToast(`🎉 Ты в списке! Позиция: #${waitlistCount}. Уведомление придёт на ${email}`, 'success');
+}
+
+// ── TOAST ──
+function showToast(message, type='success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    toast.style.transition = 'all .3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .step, .explain-item').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity .5s ease, transform .5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
